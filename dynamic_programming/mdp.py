@@ -78,7 +78,7 @@ class MDP(gym.Env):
         self.P[self.initial_state][action] = (
             self.P[self.initial_state][action][0],
             self.P[self.initial_state][action][1],
-            True,
+            transition,
         )
         finished = self.P[2][0][2]
         return (next, reward, finished, dict())

@@ -129,3 +129,7 @@ class GridWorldEnv(gym.Env):
                 else:
                     print(self.grid[row, col], end=" ")
             print("")  # Newline at the end of the row
+
+    def get_next_states(self, action: int = 0):
+        next_state, reward, is_done, _ = self.step(action, make_move=False)
+        return [(next_state, reward, 1, is_done, {})]

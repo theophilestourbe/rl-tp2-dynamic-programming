@@ -26,6 +26,26 @@ def mdp_value_iteration(mdp: MDP, max_iter: int = 1000, gamma=1.0) -> np.ndarray
     """
     values = np.zeros(mdp.observation_space.n)
     # BEGIN SOLUTION
+    old_values = None
+    eps = 1e-4
+    iter = 0
+    while (
+        old_values is None or np.abs(values - old_values).sum() > eps or iter > max_iter
+    ):
+        old_values = np.copy(values)
+        for s in range(mdp.observation_space.n):
+            mdp.reset_state(s)
+            am = -100
+            for a in range(mdp.action_space.n):
+                S = 0
+                for sp in range(mdp.observation_space.n):
+                    n, r, f, _ = mdp.step(a)
+                    if n != sp:
+                        continue
+                    S += r + gamma * old_values[sp]
+                am = max(am, S)
+            values[s] = am
+        iter += 1
     # END SOLUTION
     return values
 
@@ -42,6 +62,21 @@ def grid_world_value_iteration(
     """
     values = np.zeros((4, 4))
     # BEGIN SOLUTION
+    old_values = None
+    iter = 0
+    delta = 0
+    while iter < max_iter or delta > theta:
+        env.reset()
+        old_values = np.copy(values)
+        delta = 0
+        for row in range(env.observation_space.spaces[0].n):
+            for col in range(env.observation_space.spaces[1].n):
+                env.set_state(row, col)
+                delta += value_iteration_per_state(
+                    env, values, gamma, old_values, delta
+                )
+        iter += 1
+    return values
     # END SOLUTION
 
 
@@ -72,3 +107,18 @@ def stochastic_grid_world_value_iteration(
 ) -> np.ndarray:
     values = np.zeros((4, 4))
     # BEGIN SOLUTION
+    old_values = None
+    iter = 0
+    delta = 0
+    while iter < max_iter or delta > theta:
+        env.reset()
+        old_values = np.copy(values)
+        delta = 0
+        for row in range(env.observation_space.spaces[0].n):
+            for col in range(env.observation_space.spaces[1].n):
+                env.set_state(row, col)
+                delta += value_iteration_per_state(
+                    env, values, gamma, old_values, delta
+                )
+        iter += 1
+    return values
